@@ -1,0 +1,32 @@
+Average Accuracy Val K-Fold: 88.8460
+Average Accuracy Train K-Fold: 98.2064
+Average MCC Val K-Fold: 0.7737
+Average MCC Train K-Fold: 0.9761
+Average F1 Score Val K-Fold: 0.8922
+Average F1 Score Train K-Fold: 0.9820
+Average Precision Val K-Fold: 0.9022
+Average Precision Train K-Fold: 0.9821
+Average Recall Val K-Fold: 0.8885
+Average Recall Train K-Fold: 0.9821
+Accuracy Test: 88.55%
+MCC Test: 0.7612
+F1 Score Test: 0.8884
+Precision Test: 0.8931
+Recall Test: 0.8855
+Classification Report:
+              precision    recall  f1-score   support
+
+           1       0.74      0.84      0.79        68
+           2       0.75      0.82      0.78        11
+           3       0.71      0.77      0.74        93
+           4       0.96      0.92      0.94       422
+
+    accuracy                           0.89       594
+   macro avg       0.79      0.84      0.81       594
+weighted avg       0.89      0.89      0.89       594
+
+Confusion Matrix Test:
+[[ 57   0   8   3]
+ [  0   9   0   2]
+ [ 11   0  72  10]
+ [  9   3  22 388]]

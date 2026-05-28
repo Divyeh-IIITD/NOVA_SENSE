@@ -21,7 +21,7 @@ import joblib
 import matplotlib.pyplot as plt
 
 # function for stratified k-fold and smote
-def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None):
+def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None, plot_scores=True):
     # Stratified K-Fold
     k_fold = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=0)
     # lists to store the values
@@ -156,6 +156,17 @@ def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, 
         # save the model using joblib
         joblib.dump(classifier, os.path.join(save_path, f"{model_name}.joblib"))
         joblib.dump(scaler, os.path.join(save_path, f"{model_name}_scaler.joblib"))
+
+    if plot_scores:
+        try:
+            _plot_train_validation_scores(train_scores, val_scores, 'Train and Validation Scores for Each Fold (Stratified K-Fold + SMOTE)', save_path=save_path, model_name=model_name)
+        except Exception:
+            pass
+
+    return {
+        'train_scores': train_scores,
+        'val_scores': val_scores,
+    }
         
         
 from sklearn.tree import DecisionTreeClassifier
@@ -180,7 +191,7 @@ import os
 import joblib
 import matplotlib.pyplot as plt
 # function for  k-fold and smote
-def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None):
+def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None, plot_scores=True):
     # Stratified K-Fold
     k_fold = KFold(n_splits=num_folds, shuffle=True, random_state=0)
     # lists to store the values
@@ -314,6 +325,16 @@ def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, class
             f.write(str(conf_matrix_test) + '\n')
         print(f"Outputs saved to: {output_filename}")
         joblib.dump(classifier, os.path.join(save_path, f"{model_name}.joblib"))
+    if plot_scores:
+        try:
+            _plot_train_validation_scores(train_scores, val_scores, 'Train and Validation Scores for Each Fold (K-Fold + SMOTE)', save_path=save_path, model_name=model_name)
+        except Exception:
+            pass
+
+    return {
+        'train_scores': train_scores,
+        'val_scores': val_scores,
+    }
    
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import (
@@ -326,7 +347,7 @@ import joblib
 import matplotlib.pyplot as plt
 
 # function for stratified k-fold 
-def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None):
+def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None, plot_scores=True):
     # Stratified K-Fold
     k_fold = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=0)
     # lists to store the values
@@ -490,3 +511,13 @@ def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, 
             f.write(str(conf_matrix_test) + '\n')
         print(f"Outputs saved to: {output_filename}")
         joblib.dump(classifier, os.path.join(save_path, f"{model_name}.joblib"))
+    if plot_scores:
+        try:
+            _plot_train_validation_scores(train_scores, val_scores, 'Train and Validation Scores for Each Fold (Stratified K-Fold)', save_path=save_path, model_name=model_name)
+        except Exception:
+            pass
+
+    return {
+        'train_scores': train_scores,
+        'val_scores': val_scores,
+    }

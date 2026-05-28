@@ -20,7 +20,23 @@ import os
 import joblib
 import matplotlib.pyplot as plt
 
-def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None):
+def _plot_train_validation_scores(train_scores, val_scores, title, save_path=None, model_name=None):
+    plt.figure(figsize=(8, 5))
+    plt.plot(range(1, len(train_scores) + 1), train_scores, label='Train Score', marker='+')
+    plt.plot(range(1, len(val_scores) + 1), val_scores, label='Validation Score', marker='o')
+    plt.title(title)
+    plt.xlabel('Fold')
+    plt.ylabel('Score')
+    plt.legend()
+    plt.tight_layout()
+
+    if save_path and model_name:
+        os.makedirs(save_path, exist_ok=True)
+        plt.savefig(os.path.join(save_path, f"{model_name}_train_validation_scores.png"))
+
+    plt.show()
+
+def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None, plot_scores=True):
     k_fold = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=0)
 
     accuracies_val = []
@@ -73,6 +89,15 @@ def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, 
         precision, recall, _, _ = precision_recall_fscore_support(y_fold_val, np.round(y_val_pred), average='weighted')
         val_precision.append(precision)
         val_recall.append(recall)
+
+    if plot_scores:
+        _plot_train_validation_scores(
+            train_scores,
+            val_scores,
+            'Train and Validation Scores for Each Fold (Stratified K-Fold + SMOTE)',
+            save_path=save_path,
+            model_name=model_name,
+        )
 
     average_accuracy_val = sum(accuracies_val) / num_folds
     print(f'Average Accuracy Val K-Fold: {average_accuracy_val * 100:.4f}')
@@ -153,6 +178,11 @@ def evaluate_classifier_with_stratified_smote(X_train, y_train, X_test, y_test, 
         # save the model using joblib
         joblib.dump(classifier, os.path.join(save_path, f"{model_name}.joblib"))
 
+    return {
+        'train_scores': train_scores,
+        'val_scores': val_scores,
+    }
+
         
         
 from sklearn.tree import DecisionTreeClassifier
@@ -177,7 +207,7 @@ import os
 import joblib
 import matplotlib.pyplot as plt
 
-def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None):
+def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None, plot_scores=True):
     k_fold = KFold(n_splits=num_folds, shuffle=True, random_state=0)
 
     accuracies_val = []
@@ -231,6 +261,15 @@ def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, class
         precision, recall, _, _ = precision_recall_fscore_support(y_fold_val, np.round(y_val_pred), average='weighted')
         val_precision.append(precision)
         val_recall.append(recall)
+
+    if plot_scores:
+        _plot_train_validation_scores(
+            train_scores,
+            val_scores,
+            'Train and Validation Scores for Each Fold (K-Fold + SMOTE)',
+            save_path=save_path,
+            model_name=model_name,
+        )
 
 
     average_accuracy_val = sum(accuracies_val) / num_folds
@@ -310,6 +349,11 @@ def evaluate_classifier_with_kfold_smote(X_train, y_train, X_test, y_test, class
             f.write(str(conf_matrix_test) + '\n')
         print(f"Outputs saved to: {output_filename}")
         joblib.dump(classifier, os.path.join(save_path, f"{model_name}.joblib"))
+
+    return {
+        'train_scores': train_scores,
+        'val_scores': val_scores,
+    }
    
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import (
@@ -321,7 +365,7 @@ import os
 import joblib
 import matplotlib.pyplot as plt
 
-def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None):
+def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path=None, model_name=None, plot_scores=True):
     k_fold = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=0)
 
     accuracies_val = []
@@ -377,14 +421,14 @@ def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, 
             print(f"Error during training: {e}")
             raise
 
-    plt.plot(range(1, num_folds + 1), train_scores, label='Train Score', marker='+')
-    plt.plot(range(1, num_folds + 1), val_scores, label='Validation Score', marker='o')
-
-    plt.title('Train and Validation Scores for Each Fold')
-    plt.xlabel('Fold')
-    plt.ylabel('Score')
-    plt.legend()
-    plt.show()
+    if plot_scores:
+        _plot_train_validation_scores(
+            train_scores,
+            val_scores,
+            'Train and Validation Scores for Each Fold (Stratified K-Fold)',
+            save_path=save_path,
+            model_name=model_name,
+        )
 
     average_accuracy_val = sum(accuracies_val) / num_folds
     print(f'Average Accuracy Val K-Fold: {average_accuracy_val * 100:.4f}')
@@ -491,6 +535,11 @@ def evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, 
             f.write(str(conf_matrix_test) + '\n')
         print(f"Outputs saved to: {output_filename}")
         joblib.dump(classifier, os.path.join(save_path, f"{model_name}.joblib"))
+
+    return {
+        'train_scores': train_scores,
+        'val_scores': val_scores,
+    }
 
 # Example usage:
 # evaluate_classifier_with_stratified_kfold(X_train, y_train, X_test, y_test, classifier, num_folds=10, save_path='/your/folder/path', model_name='your_model_name')
